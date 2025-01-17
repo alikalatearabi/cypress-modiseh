@@ -1,9 +1,32 @@
 const { defineConfig } = require('cypress');
+const { Client } = require('pg');
 
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       require('cypress-mochawesome-reporter/plugin')(on);
+      on('task', {
+        fetchIban() {
+          const client = new Client({
+            host: 'localhost',
+            port: 5432,
+            user: 'postgres',
+            password: 'postgres',
+            database: 'testdb',
+          });
+
+          return client.connect()
+            .then(() => client.query('SELECT iban FROM ibans LIMIT 1'))
+            .then((result) => {
+              client.end();
+              return result.rows[0].iban; // Return the first IBAN
+            })
+            .catch((err) => {
+              client.end();
+              throw err;
+            });
+        },
+      });
     },
     // baseUrl: 'https://www.modiseh.com',
     retries: {
@@ -11,7 +34,7 @@ module.exports = defineConfig({
       openMode: 1, // Number of retries in interactive mode (cypress open)
     },
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
-    supportFile: 'cypress/support/e2e.js',
+    supportFile: 'cypress/support/commands.js',
   },
   reporter: 'cypress-mochawesome-reporter', // Use the mochawesome reporter
   reporterOptions: {

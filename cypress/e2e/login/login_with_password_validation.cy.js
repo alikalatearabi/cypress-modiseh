@@ -65,4 +65,4 @@ describe('Password Login Validation Tests - Prevent Page Progression', () => {
 
 
 // ارور رمز عبور مشکل املایی دارد
-// ایا متن ارورها میز چک شود یا خیر
+// ایا متن ارورها نیز چک شود یا خیر
